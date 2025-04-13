@@ -118,6 +118,7 @@ function M.new(opts)
   self.opts.win.list.actions = actions
   self.opts.win.preview.actions = actions
 
+  -- NOTE
   self.sort = Snacks.picker.config.sort(self.opts)
 
   self.updater = assert(uv.new_timer())

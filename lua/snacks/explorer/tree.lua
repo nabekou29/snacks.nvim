@@ -175,7 +175,7 @@ end
 
 ---@param node snacks.picker.explorer.Node
 ---@param fn fun(node: snacks.picker.explorer.Node):boolean? return `false` to not process children, `true` to abort
----@param opts? {all?: boolean}
+---@param opts? {all?: boolean, sort?: fun(a: snacks.picker.explorer.Node, b: snacks.picker.explorer.Node):boolean}
 function Tree:walk(node, fn, opts)
   local abort = false ---@type boolean?
   abort = fn(node)
@@ -184,6 +184,7 @@ function Tree:walk(node, fn, opts)
   end
   local children = vim.tbl_values(node.children) ---@type snacks.picker.explorer.Node[]
   table.sort(children, function(a, b)
+    -- vim.print(a)
     if a.dir ~= b.dir then
       return a.dir
     end

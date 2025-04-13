@@ -213,7 +213,7 @@ end
 
 ---@param opts snacks.picker.explorer.Config
 ---@type snacks.picker.finder
-function M.explorer(opts, ctx)
+function M.explorer(opts, ctx) -- TODO
   local state = M.get_state(ctx.picker)
 
   if state:setup(ctx) then
