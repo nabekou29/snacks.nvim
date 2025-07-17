@@ -1728,11 +1728,13 @@ vim.tbl_extend("force", {}, M.lsp_symbols, {
 ---@class snacks.picker.marks.Config: snacks.picker.Config
 ---@field global? boolean show global marks
 ---@field local? boolean show buffer marks
+---@field exclude? string|string[]|table<string,boolean> exclude marks by pattern. Can be a single character, multiple characters in a string, array of characters, or a lookup table
 {
   finder = "vim_marks",
   format = "file",
   global = true,
   ["local"] = true,
+  -- exclude = "0123456789", -- example: exclude all numeric marks
 }
 ```
 

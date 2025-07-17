@@ -67,25 +67,50 @@ function M.marks(opts)
     vim.list_extend(marks, vim.fn.getmarklist(vim.api.nvim_get_current_buf()))
   end
 
+  -- Build exclude lookup table for efficient filtering
+  local exclude_map = {} ---@type table<string,boolean>
+  if opts.exclude then
+    if type(opts.exclude) == "string" then
+      -- Handle string: "0123456789" -> each character is excluded
+      for i = 1, #opts.exclude do
+        exclude_map[opts.exclude:sub(i, i)] = true
+      end
+    elseif type(opts.exclude) == "table" then
+      if vim.tbl_islist(opts.exclude) then
+        -- Handle array: {"0", "1", "2"}
+        for _, char in ipairs(opts.exclude) do
+          exclude_map[char] = true
+        end
+      else
+        -- Handle lookup table: {["0"] = true, ["1"] = true}
+        exclude_map = opts.exclude
+      end
+    end
+  end
+
   ---@type snacks.picker.finder.Item[]
   local items = {}
   local bufname = vim.api.nvim_buf_get_name(0)
   for _, mark in ipairs(marks) do
-    local file = mark.file or bufname
-    local buf = mark.pos[1] and mark.pos[1] > 0 and mark.pos[1] or nil
-    local line ---@type string?
-    if buf and mark.pos[2] > 0 and vim.api.nvim_buf_is_valid(mark.pos[2]) then
-      line = vim.api.nvim_buf_get_lines(buf, mark.pos[2] - 1, mark.pos[2], false)[1]
-    end
     local label = mark.mark:sub(2, 2)
-    items[#items + 1] = {
-      text = table.concat({ label, file, line }, " "),
-      label = label,
-      line = line,
-      buf = buf,
-      file = file,
-      pos = mark.pos[2] > 0 and { mark.pos[2], mark.pos[3] },
-    }
+
+    -- Skip if this mark is excluded
+    if not exclude_map[label] then
+      local file = mark.file or bufname
+      local buf = mark.pos[1] and mark.pos[1] > 0 and mark.pos[1] or nil
+      local line ---@type string?
+      if buf and mark.pos[2] > 0 and vim.api.nvim_buf_is_valid(mark.pos[2]) then
+        line = vim.api.nvim_buf_get_lines(buf, mark.pos[2] - 1, mark.pos[2], false)[1]
+      end
+      items[#items + 1] = {
+        text = table.concat({ label, file, line }, " "),
+        label = label,
+        line = line,
+        buf = buf,
+        file = file,
+        pos = mark.pos[2] > 0 and { mark.pos[2], mark.pos[3] },
+      }
+    end
   end
   table.sort(items, function(a, b)
     return a.label < b.label
