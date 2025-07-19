@@ -317,6 +317,37 @@ function M.bufdelete(picker)
   picker:find()
 end
 
+function M.delmarks(picker)
+  picker.preview:reset()
+  local items = picker:selected({ fallback = true })
+  local deleted = {}
+  local failed = {}
+
+  for _, item in ipairs(items) do
+    if item.label then
+      local ok = pcall(vim.cmd, "delmarks " .. item.label)
+      if ok then
+        table.insert(deleted, item.label)
+      else
+        table.insert(failed, item.label)
+      end
+    end
+  end
+
+  -- Show notifications for results
+  if #deleted > 0 then
+    Snacks.notify.info(("Deleted marks: %s"):format(table.concat(deleted, ", ")), { title = "Snacks Picker" })
+  end
+  if #failed > 0 then
+    Snacks.notify.warn(("Failed to delete marks: %s"):format(table.concat(failed, ", ")), { title = "Snacks Picker" })
+  end
+
+  -- Update the picker list
+  picker.list:set_selected()
+  picker.list:set_target()
+  picker:find()
+end
+
 function M.git_stage(picker)
   local items = picker:selected({ fallback = true })
   local done = 0

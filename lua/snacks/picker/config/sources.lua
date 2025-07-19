@@ -639,6 +639,14 @@ M.marks = {
   global = true,
   ["local"] = true,
   -- exclude = "0123456789", -- example: exclude all numeric marks
+  win = {
+    input = {
+      keys = {
+        ["<c-x>"] = { "delmarks", mode = { "n", "i" } },
+      },
+    },
+    list = { keys = { ["dd"] = "delmarks" } },
+  },
 }
 
 ---@class snacks.picker.notifications.Config: snacks.picker.Config

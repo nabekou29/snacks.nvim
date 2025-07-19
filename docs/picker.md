@@ -772,6 +772,7 @@ Implementation for `vim.ui.select`
 ---@type snacks.picker.ui_select
 Snacks.picker.select(...)
 ```
+
 ## 🔍 Sources
 
 ### `autocmds`
@@ -1735,6 +1736,14 @@ vim.tbl_extend("force", {}, M.lsp_symbols, {
   global = true,
   ["local"] = true,
   -- exclude = "0123456789", -- example: exclude all numeric marks
+  win = {
+    input = {
+      keys = {
+        ["<c-x>"] = { "delmarks", mode = { "n", "i" } },
+      },
+    },
+    list = { keys = { ["dd"] = "delmarks" } },
+  },
 }
 ```
 
@@ -2359,7 +2368,6 @@ M.sidebar
 }
 ```
 
-
 ## 📦 `snacks.picker.actions`
 
 ```lua
@@ -2732,8 +2740,6 @@ Snacks.picker.actions.toggle_preview(picker)
 ```lua
 Snacks.picker.actions.yank(picker, item, action)
 ```
-
-
 
 ## 📦 `snacks.picker.core.picker`
 
