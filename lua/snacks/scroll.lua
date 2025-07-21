@@ -22,6 +22,7 @@ M.meta = {
 ---@class snacks.scroll.Config
 ---@field animate snacks.animate.Config|{}
 ---@field animate_repeat snacks.animate.Config|{}|{delay:number}
+---@field min_lines? number minimum lines to trigger animation
 local defaults = {
   animate = {
     duration = { step = 15, total = 250 },
@@ -37,6 +38,8 @@ local defaults = {
   filter = function(buf)
     return vim.g.snacks_scroll ~= false and vim.b[buf].snacks_scroll ~= false and vim.bo[buf].buftype ~= "terminal"
   end,
+  -- minimum lines to trigger smooth scroll animation (default: 3)
+  min_lines = 3,
   debug = false,
 }
 
@@ -300,6 +303,16 @@ function M.check(win)
     col_from = vim.fn.virtcol({ state.current.lnum, state.current.col })
     col_to = vim.fn.virtcol({ state.target.lnum, state.target.col })
   end)
+
+  -- skip animation if scroll distance is below threshold
+  if config.min_lines and scrolls < config.min_lines then
+    vim.api.nvim_win_call(state.win, function()
+      vim.fn.winrestview(state.target)
+    end)
+    state.current = vim.deepcopy(state.target)
+    wo(win) -- restore window options
+    return
+  end
 
   local down = state.target.topline > state.current.topline
     or (state.target.topline == state.current.topline and state.target.topfill < state.current.topfill)
